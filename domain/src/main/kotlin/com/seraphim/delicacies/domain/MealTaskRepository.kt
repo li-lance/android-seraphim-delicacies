@@ -2,26 +2,26 @@ package com.seraphim.delicacies.domain
 
 import com.seraphim.delicacies.shared.database.dao.TaskDao
 import com.seraphim.delicacies.shared.database.entity.TaskEntity
+import com.seraphim.delicacies.shared.network.ApiService
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
-class MealTaskRepository(dao: TaskDao) {
-    private val taskDao = dao
-
+class MealTaskRepository(val dao: TaskDao,val api: ApiService) {
     suspend fun insertTask(task: TaskEntity): Long {
-        return taskDao.insertTask(task)
+        return dao.insertTask(task)
     }
 
     suspend fun updateLunch(day: String, isLunch: Boolean) {
-        taskDao.updateLunchTask(day, isLunch)
+        dao.updateLunchTask(day, isLunch)
     }
 
     suspend fun updateDinner(day: String, isDinner: Boolean) {
-        taskDao.updateDinnerTask(day, isDinner)
+        dao.updateDinnerTask(day, isDinner)
     }
 
-    fun getTaskByDay(day: String) = taskDao.getTaskByDay(day)
+    fun getTaskByDay(day: String) = dao.getTaskByDay(day)
 
-    fun getTaskByDayCount(day: String) = taskDao.getTaskByDay(day).map {
+    fun getTaskByDayCount(day: String) = dao.getTaskByDay(day).map {
         var count = 0
         if (it?.isLunch == true) count++
         if (it?.isDinner == true) count++
@@ -29,8 +29,10 @@ class MealTaskRepository(dao: TaskDao) {
     }
 
     suspend fun deleteTaskByDay(day: String) {
-        taskDao.deleteTaskByDay(day)
+        dao.deleteTaskByDay(day)
     }
 
-    fun getMonthlyMealTotal(month: String) = taskDao.getMonthlyMealTotal(month)
+    fun getMonthlyMealTotal(month: String) = dao.getMonthlyMealTotal(month)
+
+    suspend fun getImage() = api.getImage()
 }

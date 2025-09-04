@@ -4,5 +4,5 @@ import com.seraphim.delicacies.domain.MealTaskRepository
 import org.koin.dsl.module
 
 val domainModule = module {
-    single { MealTaskRepository(get()) }
+    single { MealTaskRepository(get(),get()) }
 }

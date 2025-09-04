@@ -38,9 +38,11 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.okhttp.logging)
+
         }
-        iosMain.dependencies {
-            implementation(libs.ktor.client.ios)
+        nativeMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

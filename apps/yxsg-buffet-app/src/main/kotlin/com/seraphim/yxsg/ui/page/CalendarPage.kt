@@ -60,7 +60,7 @@ fun CalendarPage() {
     val isDinnerChecked by viewModel.isDinnerChecked.collectAsStateWithLifecycle()
     val daysOfWeek = remember { daysOfWeek() }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         TopAppBar(title = { Text(text = "食光记录") }, navigationIcon = {
             IconButton(onClick = {
                 navController.popBackStack()

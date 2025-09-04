@@ -6,6 +6,8 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.seraphim.delicacies.domain.MealTaskRepository
 import com.seraphim.delicacies.shared.database.entity.TaskEntity
+import com.seraphim.utils.safeKvGet
+import com.seraphim.utils.safeKvSave
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +28,9 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
     val isLunchChecked = _isLunchChecked.asStateFlow()
     private val _isDinnerChecked = MutableStateFlow(false)
     val isDinnerChecked = _isDinnerChecked.asStateFlow()
+
+    private val _imageUrl = MutableStateFlow("")
+    val imageUrl = _imageUrl.asStateFlow()
     val monthString = YearMonth.now().toString()
 
     init {
@@ -43,6 +48,33 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
                 }
             }
         }
+    }
+
+    fun fetchImage() {
+        val key = "local_image_date" + LocalDate.now().toString()
+        val url = safeKvGet(key, "")
+        if (url.isNotEmpty()) {
+            _imageUrl.value = url
+            return
+        } else {
+            viewModelScope.launch {
+                val image = repository.getImage().image
+                _imageUrl.value = image
+                image.safeKvSave(key)
+            }
+        }
+//        viewModelScope.launch {
+//            repository.getLocalImage().collectLatest { task ->
+//                if (task?.image != null) {
+//                    _imageUrl.value = task.image.orEmpty()
+//                } else {
+//                    val image = repository.getImage().image
+//                    repository.setLocalImage(LocalDate.now().toString(), image)
+//                    _imageUrl.value = image
+//                }
+//            }
+//
+//        }
     }
 
     suspend fun insertTask(day: String, isLunch: Boolean, isDinner: Boolean) {
@@ -143,7 +175,12 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
 
     suspend fun deleteTaskByDay(day: String) = repository.deleteTaskByDay(day)
 
-    fun getMonthlyMealTotal(month: String) = repository.getMonthlyMealTotal(month)
+    fun getMonthlyMealTotal(month: String) = repository.getMonthlyMealTotal(month).stateIn(
+        viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = 0
+    )
+
     fun updateSelectedDate(day: CalendarDay) {
         _selectedDateFlow.value = day
     }
