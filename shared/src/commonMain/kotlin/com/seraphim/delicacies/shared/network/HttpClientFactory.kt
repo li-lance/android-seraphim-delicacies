@@ -21,6 +21,7 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.io.IOException
@@ -57,16 +58,16 @@ object HttpClientFactory {
                 level = logLevel
                 logger = ktorLogger
             }
-            HttpResponseValidator {
-                validateResponse { response ->
-                    if (!response.status.isSuccess()) {
-                        throw ResponseException(response, response.bodyAsText())
-                    }
-                }
-                handleResponseExceptionWithRequest { cause, _ ->
-                    throw asNetworkException(cause)
-                }
-            }
+//            HttpResponseValidator {
+//                validateResponse { response ->
+//                    if (!response.status.isSuccess()) {
+//                        throw ResponseException(response, response.bodyAsText())
+//                    }
+//                }
+//                handleResponseExceptionWithRequest { cause, _ ->
+//                    throw asNetworkException(cause)
+//                }
+//            }
             // 平台相关引擎细节（Android 配置 OkHttp，iOS 配置 Darwin）
             platformEngineConfig()
         }
@@ -74,18 +75,18 @@ object HttpClientFactory {
 }
 
 // 统一错误映射（提供给 HttpResponseValidator 和外部 runCatching 使用）
-suspend fun asNetworkException(t: Throwable): Throwable = when (t) {
-    is ResponseException -> NetworkException.Http(
-        status = t.response.status.value,
-        body = runCatching { t.response.bodyAsText() }.getOrNull(),
-        cause = t
-    )
-
-    is HttpRequestTimeoutException, is SocketTimeoutException -> NetworkException.Timeout(t)
-    is IOException -> NetworkException.Network(t)
-    is kotlinx.serialization.SerializationException -> NetworkException.Serialization(t)
-    else -> NetworkException.Unknown(t)
-}
+//suspend fun asNetworkException(t: Throwable): Throwable = when (t) {
+//    is ResponseException -> BffResult.Http(
+//        status = t.response.status.value,
+//        body = runCatching { t.response.bodyAsText() }.getOrNull(),
+//        cause = t
+//    )
+//
+//    is HttpRequestTimeoutException, is SocketTimeoutException -> NetworkException.Timeout(t)
+//    is IOException -> NetworkException.Network(t)
+//    is kotlinx.serialization.SerializationException -> NetworkException.Serialization(t)
+//    else -> NetworkException.Unknown(t)
+//}
 
 // 简化安全调用模板
 suspend inline fun <reified T> HttpClient.safeGet(
@@ -94,7 +95,7 @@ suspend inline fun <reified T> HttpClient.safeGet(
 ): Result<T> = runCatching { this.get(path, builder).body<T>() }
     .fold(
         onSuccess = { Result.success(it) },
-        onFailure = { Result.failure(asNetworkException(it)) }
+        onFailure = { Result.failure(it) }
     )
 //// 给 Result 增加错误映射
 //fun <T> Result<T>.mapFailure(transform: (Throwable) -> Throwable): Result<T> =
