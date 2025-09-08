@@ -12,7 +12,7 @@ val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val SpotifyGreen = Color(0xFF42C83C)
 
-val OnSurfaceLight = Color(0xFF808080)
+val OnSurfaceLight = Color(0xFF4A5660)
 val OnSurfaceDark = Color(0xFF737373)
 val OnBackgroundLight = White
 val OnBackgroundDark = Color(0xFF343434)

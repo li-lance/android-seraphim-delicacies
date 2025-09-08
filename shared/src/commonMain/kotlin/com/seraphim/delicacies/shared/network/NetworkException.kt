@@ -1,11 +1,14 @@
 package com.seraphim.delicacies.shared.network
 
-sealed class NetworkException(message: String?, cause: Throwable? = null) : Exception(message, cause) {
-    class Timeout(cause: Throwable? = null) : NetworkException("Request timed out", cause)
-    class Network(cause: Throwable? = null) : NetworkException("Network I/O error", cause)
-    class Serialization(cause: Throwable? = null) : NetworkException("Serialization error", cause)
-    class Http(val status: Int, val body: String? = null, cause: Throwable? = null) :
-        NetworkException("HTTP error $status${body?.let { ": $it" } ?: ""}", cause)
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+@Serializable
+data class NetworkException(val code: Int,val message: String?, val cause: String? = null)
 
-    class Unknown(cause: Throwable? = null) : NetworkException("Unknown error", cause)
-}
+internal inline fun <T> runCatchingOrError(block: () -> BffResult<T>): BffResult<T> =
+    runCatching { block() }.getOrElse {
+        when (it) {
+            is SerializationException -> BffResult.Failure.SerializationError(it)
+            else -> BffResult.Failure.NetworkError(it)
+        }
+    }

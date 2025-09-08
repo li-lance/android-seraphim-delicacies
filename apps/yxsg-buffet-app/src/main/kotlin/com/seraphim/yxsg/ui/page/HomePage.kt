@@ -30,6 +30,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.CalendarPageDestination
 import com.seraphim.yxsg.R
 import com.seraphim.yxsg.ui.LocalDestinationsNavigator
+import com.seraphim.yxsg.ui.theme.Typography
 import com.seraphim.yxsg.viewmodel.CalendarViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
@@ -75,8 +76,11 @@ fun HomePage() {
                 .height(160.dp)
 
         )
-        Text("今日堂食记录")
-        Text(LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日")
+        Text("今日堂食记录", style = Typography.titleLarge)
+        Text(
+            LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
+            style = Typography.bodyMedium
+        )
         Text(LocalDate.now().dayOfWeek.displayText())
         TodayView(
             task.first, task.second, viewModel, CalendarDay(LocalDate.now(), DayPosition.MonthDate)

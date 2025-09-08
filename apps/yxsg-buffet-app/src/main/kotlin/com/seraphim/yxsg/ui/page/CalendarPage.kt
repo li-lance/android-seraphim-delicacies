@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Checkbox
@@ -25,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +43,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.seraphim.yxsg.ui.LocalDestinationsNavigator
 import com.seraphim.yxsg.ui.theme.Black
 import com.seraphim.yxsg.ui.theme.OnBackgroundDark
+import com.seraphim.yxsg.ui.theme.OnSurfaceLight
 import com.seraphim.yxsg.ui.theme.Typography
 import com.seraphim.yxsg.ui.theme.White
 import com.seraphim.yxsg.viewmodel.CalendarViewModel
@@ -60,7 +65,11 @@ fun CalendarPage() {
     val isDinnerChecked by viewModel.isDinnerChecked.collectAsStateWithLifecycle()
     val daysOfWeek = remember { daysOfWeek() }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         TopAppBar(title = { Text(text = "食光记录") }, navigationIcon = {
             IconButton(onClick = {
                 navController.popBackStack()
@@ -124,38 +133,44 @@ private fun Day(
         modifier = Modifier
             .aspectRatio(1f)
             .padding(1.dp)
-            .background(color = if (isSelected) Color.Red else White)
+            .background(
+                color = if (isSelected) Color.Red else White,
+                if (isSelected) CircleShape else RectangleShape
+            )
             .clickable(
                 enabled = day.position == DayPosition.MonthDate && !day.date.isAfter(today),
                 onClick = { onClick(day) },
             ),
     ) {
-        val textColor = when (day.position) {
-            DayPosition.MonthDate -> Black
-            DayPosition.InDate, DayPosition.OutDate -> OnBackgroundDark
+        val textColor = when {
+            day.date == today -> if (isSelected) Color.White else Color.Red
+            day.position == DayPosition.MonthDate -> OnSurfaceLight
+            else -> Color(0XFFB5BEC6)
         }
         Text(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 3.dp, end = 4.dp),
+                .align(Alignment.Center)
+                .padding(top = 3.dp),
             text = day.date.dayOfMonth.toString(),
             color = textColor,
-            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
         )
-        Column(
+        Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.Center,
         ) {
-            for (color in barColors) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(5.dp)
-                        .background(color),
-                )
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                for (color in barColors) {
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .background(color, CircleShape),
+                    )
+                }
             }
         }
     }
@@ -171,8 +186,8 @@ private fun MonthHeader(
             Text(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                fontSize = 12.sp,
-                color = Color.Black,
+                fontSize = 14.sp,
+                color = Color(0XFFB5BEC6),
                 text = dayOfWeek.displayText(uppercase = true),
                 fontWeight = FontWeight.Light,
             )

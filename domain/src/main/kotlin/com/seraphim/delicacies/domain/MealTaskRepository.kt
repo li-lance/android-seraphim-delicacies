@@ -3,10 +3,11 @@ package com.seraphim.delicacies.domain
 import com.seraphim.delicacies.shared.database.dao.TaskDao
 import com.seraphim.delicacies.shared.database.entity.TaskEntity
 import com.seraphim.delicacies.shared.network.ApiService
+import com.seraphim.delicacies.shared.network.BffResult
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
-class MealTaskRepository(val dao: TaskDao,val api: ApiService) {
+class MealTaskRepository(val dao: TaskDao, val api: ApiService) {
     suspend fun insertTask(task: TaskEntity): Long {
         return dao.insertTask(task)
     }
@@ -34,5 +35,11 @@ class MealTaskRepository(val dao: TaskDao,val api: ApiService) {
 
     fun getMonthlyMealTotal(month: String) = dao.getMonthlyMealTotal(month)
 
-    suspend fun getImage() = api.getImage()
+    suspend fun getImage(): String {
+        val result = api.getImage()
+        return when (result) {
+            is BffResult.Success -> result.response.image
+            else -> ""
+        }
+    }
 }

@@ -58,7 +58,7 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
             return
         } else {
             viewModelScope.launch {
-                val image = repository.getImage().image
+                val image = repository.getImage()
                 _imageUrl.value = image
                 image.safeKvSave(key)
             }
