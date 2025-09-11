@@ -31,6 +31,8 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
 
     private val _imageUrl = MutableStateFlow("")
     val imageUrl = _imageUrl.asStateFlow()
+    private val _todayTask = MutableStateFlow(Pair(false, false))
+    val todayTask = _todayTask.asStateFlow()
     val monthString = YearMonth.now().toString()
 
     init {
@@ -161,17 +163,20 @@ class CalendarViewModel(private val repository: MealTaskRepository) : ViewModel(
         initialValue = 0
     )
 
-    fun getTodayTask() = repository.getTaskByDay(LocalDate.now().toString()).map {
-        if (it == null) {
-            Pair(false, false)
-        } else {
-            Pair(it.isLunch, it.isDinner)
+    fun getTodayTask() {
+        viewModelScope.launch {
+            repository.getTaskByDay(LocalDate.now().toString()).map {
+                if (it == null) {
+                    Pair(false, false)
+                } else {
+                    Pair(it.isLunch, it.isDinner)
+                }
+            }.collectLatest {
+                _todayTask.value = it
+            }
         }
-    }.stateIn(
-        viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = Pair(false, false)
-    )
+
+    }
 
     suspend fun deleteTaskByDay(day: String) = repository.deleteTaskByDay(day)
 

@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
@@ -28,6 +31,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.CalendarPageDestination
+import com.seraphim.utils.Logger
 import com.seraphim.yxsg.R
 import com.seraphim.yxsg.ui.LocalDestinationsNavigator
 import com.seraphim.yxsg.ui.theme.Typography
@@ -43,11 +47,23 @@ fun HomePage() {
     val viewModel: CalendarViewModel = koinViewModel()
     val totalFlow = remember { viewModel.getMonthlyMealTotal(YearMonth.now().toString()) }
     val total by totalFlow.collectAsStateWithLifecycle()
-    val taskFlow = remember { viewModel.getTodayTask() }
-    val task by taskFlow.collectAsStateWithLifecycle()
+    val task by viewModel.todayTask.collectAsStateWithLifecycle()
     val imageUrl by viewModel.imageUrl.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         viewModel.fetchImage()
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.getTodayTask()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

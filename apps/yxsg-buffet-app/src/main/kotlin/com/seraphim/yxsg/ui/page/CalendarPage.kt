@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -41,8 +39,6 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.seraphim.yxsg.ui.LocalDestinationsNavigator
-import com.seraphim.yxsg.ui.theme.Black
-import com.seraphim.yxsg.ui.theme.OnBackgroundDark
 import com.seraphim.yxsg.ui.theme.OnSurfaceLight
 import com.seraphim.yxsg.ui.theme.Typography
 import com.seraphim.yxsg.ui.theme.White
@@ -144,7 +140,7 @@ private fun Day(
     ) {
         val textColor = when {
             day.date == today -> if (isSelected) Color.White else Color.Red
-            day.position == DayPosition.MonthDate -> OnSurfaceLight
+            day.position == DayPosition.MonthDate -> if (isSelected) Color.White else OnSurfaceLight
             else -> Color(0XFFB5BEC6)
         }
         Text(
