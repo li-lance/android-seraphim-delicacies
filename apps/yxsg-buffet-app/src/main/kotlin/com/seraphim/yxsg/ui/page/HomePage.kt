@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Notifications
@@ -92,16 +93,24 @@ fun HomePage() {
                 .height(160.dp)
 
         )
-        Text("今日堂食记录", style = Typography.titleLarge)
         Text(
-            LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = "今日堂食记录",
+            style = Typography.titleLarge
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
             style = Typography.bodyMedium
         )
-        Text(LocalDate.now().dayOfWeek.displayText())
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = LocalDate.now().dayOfWeek.displayText()
+        )
         TodayView(
             task.first, task.second, viewModel, CalendarDay(LocalDate.now(), DayPosition.MonthDate)
         )
 
-        Text("本月堂食统计(${total})")
+        Text(modifier = Modifier.padding(horizontal = 16.dp), text = "本月堂食统计(${total})")
     }
 }
