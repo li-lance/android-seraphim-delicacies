@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.napier.logger)
     implementation(libs.mmkv.kotlin)
     implementation(libs.calendar)
+    implementation(libs.androidx.work.ktx)
 }
 baselineProfile {
     // Don't build on every iteration of a full assemble.

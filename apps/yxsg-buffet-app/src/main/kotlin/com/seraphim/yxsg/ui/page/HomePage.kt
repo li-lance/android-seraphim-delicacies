@@ -1,6 +1,7 @@
 package com.seraphim.yxsg.ui.page
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -81,6 +84,16 @@ fun HomePage() {
                 )
             }
         })
+        Row(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
+                style = Typography.bodyMedium.copy(fontSize = 20.sp, fontWeight = FontWeight(500))
+            )
+            Text(
+                text = "(" + LocalDate.now().dayOfWeek.displayText() + ")",
+                style = Typography.bodyMedium.copy(fontSize = 20.sp, fontWeight = FontWeight(500))
+            )
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current).data(imageUrl)
                 .diskCachePolicy(CachePolicy.ENABLED) // 启用磁盘缓存
@@ -96,17 +109,9 @@ fun HomePage() {
         Text(
             modifier = Modifier.padding(horizontal = 16.dp),
             text = "今日堂食记录",
-            style = Typography.titleLarge
+            style = Typography.titleLarge.copy(fontWeight = FontWeight(600))
         )
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
-            style = Typography.bodyMedium
-        )
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = LocalDate.now().dayOfWeek.displayText()
-        )
+
         TodayView(
             task.first, task.second, viewModel, CalendarDay(LocalDate.now(), DayPosition.MonthDate)
         )
