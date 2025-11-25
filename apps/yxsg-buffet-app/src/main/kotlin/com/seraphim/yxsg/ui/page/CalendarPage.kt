@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,6 +61,8 @@ fun CalendarPage() {
     val selectedDay by viewModel.selectedDateFlow.collectAsStateWithLifecycle()
     val isLunchChecked by viewModel.isLunchChecked.collectAsStateWithLifecycle()
     val isDinnerChecked by viewModel.isDinnerChecked.collectAsStateWithLifecycle()
+    val totalFlow = remember { viewModel.getMonthlyMealTotal(YearMonth.now().toString()) }
+    val total by totalFlow.collectAsStateWithLifecycle()
     val daysOfWeek = remember { daysOfWeek() }
 
     Column(
@@ -71,14 +75,12 @@ fun CalendarPage() {
                 navController.popBackStack()
             }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "calendar"
+                    imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "calendar"
                 )
             }
         })
         Text(
-            "${YearMonth.now()}",
-            modifier = Modifier.padding(16.dp),
+            "${YearMonth.now()}", modifier = Modifier.padding(16.dp),
 //            color = Black,
             style = Typography.headlineLarge
         )
@@ -99,7 +101,7 @@ fun CalendarPage() {
                 .fillMaxWidth(),
             style = Typography.titleLarge,
         )
-        TodayView(isLunchChecked, isDinnerChecked, viewModel, selectedDay)
+        TodayView(isLunchChecked, isDinnerChecked, total, viewModel, selectedDay)
     }
 }
 
@@ -195,44 +197,61 @@ private fun MonthHeader(
 fun TodayView(
     isLunchChecked: Boolean,
     isDinnerChecked: Boolean,
+    total: Int,
     viewModel: CalendarViewModel,
     selectedDay: CalendarDay
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("午餐")
-        Checkbox(
-            checked = isLunchChecked,
-            onCheckedChange = {
-                viewModel.updateLunch(
-                    selectedDay.date.toString(),
-                    isLunch = it,
+    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Card {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+                Text(
+                    text = "今日堂食记录",
+                    style = Typography.titleMedium,
                 )
+                //午餐
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("午餐")
+                    Checkbox(
+                        checked = isLunchChecked, onCheckedChange = {
+                            viewModel.updateLunch(
+                                selectedDay.date.toString(),
+                                isLunch = it,
+                            )
+                        })
+                }
+                //晚餐
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("晚餐")
+                    Checkbox(
+                        checked = isDinnerChecked, onCheckedChange = {
+                            viewModel.updateDinner(
+                                selectedDay.date.toString(),
+                                isDinner = it,
+                            )
+                        })
+                }
             }
-        )
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("晚餐")
-        Checkbox(
-            checked = isDinnerChecked,
-            onCheckedChange = {
-                viewModel.updateDinner(
-                    selectedDay.date.toString(),
-                    isDinner = it,
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+        Card {
+            //本月食堂记录
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+            ) {
+                Text(
+                    text = "本月食堂记录",
+                    style = Typography.titleMedium,
                 )
+                Text("$total")
+                Text("次")
             }
-        )
+        }
     }
 }
 

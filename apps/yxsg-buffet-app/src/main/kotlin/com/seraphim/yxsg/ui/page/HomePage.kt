@@ -1,5 +1,6 @@
 package com.seraphim.yxsg.ui.page
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Notifications
@@ -40,6 +43,7 @@ import com.ramcosta.composedestinations.generated.destinations.CalendarPageDesti
 import com.seraphim.yxsg.R
 import com.seraphim.yxsg.ui.LocalDestinationsNavigator
 import com.seraphim.yxsg.ui.theme.Typography
+import com.seraphim.yxsg.utils.HelloUtils
 import com.seraphim.yxsg.viewmodel.CalendarViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
@@ -85,6 +89,28 @@ fun HomePage() {
                 )
             }
         })
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 24.dp)
+                .background(
+                    Color.Black,
+                    RoundedCornerShape(8.dp)
+                )
+        ) {
+            Text(
+                HelloUtils.greeting() + "，" + "Lance",
+                color = Color.White,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                style = Typography.titleLarge.copy(fontWeight = FontWeight(600))
+            )
+            Text(
+                "今天是个好日子，记得按时去堂食哦~",
+                color = Color.White,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
+            )
+        }
         Row(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = LocalDate.now().month.value.toString() + "月" + LocalDate.now().dayOfMonth + "日",
@@ -108,7 +134,11 @@ fun HomePage() {
 //
 //        )
         Box(modifier = Modifier.padding(16.dp)) {
-            Card(modifier = Modifier.fillMaxWidth().height(260.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp)
+            ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     SegmentedRingChart(
                         value = total.toFloat(),
@@ -129,16 +159,12 @@ fun HomePage() {
             }
         }
 
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = "今日堂食记录",
-            style = Typography.titleLarge.copy(fontWeight = FontWeight(600))
-        )
-
         TodayView(
-            task.first, task.second, viewModel, CalendarDay(LocalDate.now(), DayPosition.MonthDate)
+            task.first,
+            task.second,
+            total,
+            viewModel,
+            CalendarDay(LocalDate.now(), DayPosition.MonthDate)
         )
-
-        Text(modifier = Modifier.padding(horizontal = 16.dp), text = "本月堂食统计(${total})")
     }
 }
